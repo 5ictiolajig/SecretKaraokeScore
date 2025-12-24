@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Secret Karaoke Score — Zama FHEVM</title>
+  <style>
+  :root {
+    --bg-body: #fdfdfd;
+    --bg-card: #ffffff;
+    --border-card: #e5e7eb;
+    --accent: #ec4899;
+    --accent-alt: #8b5cf6;
+    --accent-soft: rgba(236, 72, 153, 0.12);
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --radius-xl: 20px;
+    --radius-lg: 12px;
+    --shadow-card: 0 18px 45px rgba(148, 163, 184, 0.35);
+    --input-border: #d1d5db;
+    --input-bg: #f9fafb;
+    --status-muted: #4b5563;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background:
+      linear-gradient(135deg, #fdf2ff 0, #eff6ff 40%, #f9fafb 100%);
+    color: var(--text-main);
+    padding: 32px 20px;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 16px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(209, 213, 219, 0.8);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h1::after {
+    content: "Live Session";
+    font-size: 0.78rem;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #047857;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  h2 {
+    margin: 0 0 4px 0;
+    font-size: 1.02rem;
+  }
+
+  .card {
+    border-radius: var(--radius-xl);
+    padding: 18px 20px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at top right, rgba(236, 72, 153, 0.1), transparent 55%),
+      radial-gradient(circle at bottom left, rgba(129, 140, 248, 0.12), transparent 55%);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .col {
+    flex: 1;
+    min-width: 190px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 8px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+  }
+
+  input {
+    width: 100%;
+    margin-top: 4px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, transform 0.05s ease;
+  }
+
+  input:focus {
+    border-color: var(--accent);
+    background: #ffffff;
+    box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.22);
+    transform: translateY(-0.5px);
+  }
+
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+    color: #f9fafb;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 14px 28px rgba(129, 140, 248, 0.35);
+    transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    white-space: nowrap;
+  }
+
+  button::before {
+    content: "●";
+    font-size: 0.7rem;
+    color: rgba(248, 250, 252, 0.8);
+  }
+
+  button.secondary {
+    background: #f3f4f6;
+    color: #111827;
+    box-shadow: 0 8px 18px rgba(148, 163, 184, 0.4);
+  }
+
+  button.secondary::before {
+    content: "◎";
+  }
+
+  button.success {
+    background: linear-gradient(135deg, #22c55e, #15803d);
+    box-shadow: 0 14px 28px rgba(34, 197, 94, 0.35);
+  }
+
+  button.success::before {
+    content: "★";
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  button:not(:disabled):hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+  }
+
+  .status {
+    margin-top: 10px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+  }
+
+  .status.pending {
+    display: inline-flex;
+    background: rgba(251, 191, 36, 0.12);
+    color: #92400e;
+  }
+
+  .status.pending::before {
+    background: #f59e0b;
+  }
+
+  .status.success {
+    display: inline-flex;
+    background: rgba(22, 163, 74, 0.08);
+    color: #15803d;
+  }
+
+  .status.success::before {
+    background: #22c55e;
+  }
+
+  .status.error {
+    display: inline-flex;
+    background: rgba(239, 68, 68, 0.06);
+    color: #b91c1c;
+  }
+
+  .status.error::before {
+    background: #ef4444;
+  }
+
+  pre {
+    background: #020617;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(15, 23, 42, 0.7);
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    overflow: auto;
+    max-height: 220px;
+    white-space: pre-wrap;
+    color: #e5e7eb;
+    margin-top: 8px;
+  }
+
+  .result-box {
+    margin-top: 10px;
+    padding: 11px 13px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    display: none;
+    border: 1px solid transparent;
+  }
+
+  .result-box.none {
+    background: #f3f4f6;
+    color: var(--status-muted);
+    border-color: #e5e7eb;
+  }
+
+  .result-box.bronze {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fbbf24;
+  }
+
+  .result-box.silver {
+    background: #e5e7eb;
+    color: #111827;
+    border-color: #9ca3af;
+  }
+
+  .result-box.gold {
+    background: #fef9c3;
+    color: #92400e;
+    border-color: #facc15;
+  }
+
+  p[style] {
+    color: var(--text-muted) !important;
+    font-size: 0.83rem !important;
+  }
+
+  footer {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  #btnConnect {
+    background: #111827;
+    color: #f9fafb;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.45);
+  }
+
+  #btnConnect::before {
+    content: "⦿";
+  }
+
+  @media (max-width: 640px) {
+    body {
+      padding: 20px 14px;
+    }
+
+    header {
+      border-radius: 16px;
+    }
+
+    .card {
+      padding: 16px 14px 14px;
+    }
+
+    h1 {
+      font-size: 1.26rem;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎤 Secret Karaoke Score</h1>
+      <button id="btnConnect">Connect Wallet</button>
+    </header>
+
+    <!-- 1. SUBMIT SCORE -->
+    <section class="card">
+      <h2>1. Submit Secret Score</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Client computes a local karaoke score, encrypts it, and submits it under a user key.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>User Key (any string, e.g. "user-1")</label>
+          <input id="userKey" type="text" placeholder="user-1" value="user-1" />
+        </div>
+        <div class="col">
+          <label>Karaoke Score (0–1000)</label>
+          <input id="userScore" type="number" min="0" max="1000" value="650" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnSubmitScore" class="success">Submit Secret Score</button>
+      </div>
+      <div id="scoreStatus" class="status"></div>
+      <pre id="scoreLog" style="display:none;"></pre>
+    </section>
+
+    <!-- 2. COMPUTE LEVEL -->
+    <section class="card">
+      <h2>2. Compute Karaoke Level</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Contract compares your encrypted score against Bronze/Silver/Gold thresholds and stores an encrypted level.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>User Key (same as above)</label>
+          <input id="levelUserKey" type="text" placeholder="user-1" value="user-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnComputeLevel" class="success">Compute Encrypted Level</button>
+      </div>
+      <div id="levelStatus" class="status"></div>
+      <pre id="levelHandleOutput" style="display:none;"></pre>
+    </section>
+
+    <!-- 3. MAKE PUBLIC & DECRYPT -->
+    <section class="card">
+      <h2>3. Make Public & Decrypt Level</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Make your level publicly decryptable and reveal only the tier, not the raw score.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>User Key</label>
+          <input id="decryptUserKey" type="text" placeholder="user-1" value="user-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnGetLevelHandle" class="secondary">Get Level Handle</button>
+        <button id="btnMakeLevelPublic">Make Level Public</button>
+        <button id="btnDecryptLevel" class="success">Decrypt Level</button>
+      </div>
+
+      <div id="decryptStatus" class="status"></div>
+      <pre id="handleOutput" style="display:none;"></pre>
+      <div id="levelResult" class="result-box"></div>
+    </section>
+
+    <footer>
+      Zama FHEVM · Secret Karaoke Score · Relayer SDK 0.3.0 · Ethers v6
+    </footer>
+  </div>
+
+  <script type="module">
+    import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+    import { BrowserProvider, Contract, getAddress, keccak256, toUtf8Bytes } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+
+    const CONFIG = {
+      RELAYER_URL: "https://relayer.testnet.zama.org",
+      GATEWAY_URL: "https://gateway.testnet.zama.org",
+      CONTRACT_ADDRESS: "0x81551aaE3390D72D2B7D8aD016c25EFc9fFBdD0d"
+    };
+
+    const ABI = [
+      "function submitScore(bytes32 userId, bytes32 encScore, bytes attestation) external",
+      "function computeLevel(bytes32 userId, bytes32 encZero, bytes attestation) external returns (bytes32)",
+      "function makeLevelPublic(bytes32 userId) external",
+      "function levelHandle(bytes32 userId) external view returns (bytes32)",
+      "function entryExists(bytes32 userId) external view returns (bool)",
+      "function levelExists(bytes32 userId) external view returns (bool)",
+      "function entryOwner(bytes32 userId) external view returns (address)"
+    ];
+
+    let provider, signer, address, contract, relayer;
+    const $ = s => document.querySelector(s);
+
+    const log = (title, data) => console.log(`%c[${title}]`, "color:#38bdf8;font-weight:bold;", data);
+    const logError = (title, err) => console.error(`%c[ERROR:${title}]`, "color:#ef4444;font-weight:bold;", err);
+
+    const toHex = u8 => "0x" + Array.from(u8, b => b.toString(16).padStart(2,"0")).join("");
+
+    const setStatus = (id, msg, type="pending") => {
+      const el = $(id);
+      if (!el) return;
+      el.textContent = msg;
+      el.className = `status ${type}`;
+      el.style.display = "block";
+      log(`STATUS ${id}`, msg);
+    };
+    const clearStatus = id => {
+      const el = $(id);
+      if (el) el.style.display = "none";
+    };
+
+    const toUserId = (text) => {
+      const t = (text || "").trim();
+      const h = keccak256(toUtf8Bytes(t));
+      log("UserId derived", { key: t, userId: h });
+      return h;
+    };
+
+    async function connect() {
+      try {
+        log("Connect", "start");
+        if (!window.ethereum) throw new Error("MetaMask not installed");
+
+        provider = provider || new BrowserProvider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        log("Accounts", accounts);
+
+        signer = signer || await provider.getSigner();
+        address = address || await signer.getAddress();
+        log("Address", address);
+
+        contract = contract || new Contract(getAddress(CONFIG.CONTRACT_ADDRESS), ABI, signer);
+        log("Contract", CONFIG.CONTRACT_ADDRESS);
+
+        $("#btnConnect").textContent = address.slice(0, 6) + "…" + address.slice(-4);
+
+        if (!relayer) {
+          await initSDK();
+          relayer = await createInstance({
+            ...SepoliaConfig,
+            relayerUrl: CONFIG.RELAYER_URL,
+            gatewayUrl: CONFIG.GATEWAY_URL,
+            network: window.ethereum,
+            debug: true
+          });
+          log("Relayer", "instance created");
+        }
+
+        log("Connect", "done");
+        return true;
+      } catch (e) {
+        logError("Connect", e);
+        setStatus("#scoreStatus", "Wallet/relayer connection failed", "error");
+        return false;
+      }
+    }
+
+    $("#btnConnect").onclick = connect;
+
+    async function encryptEuint16(value) {
+      if (!relayer) throw new Error("Relayer not initialized");
+      if (!address) throw new Error("No wallet address");
+
+      log("EncryptEuint16", { value });
+
+      const enc = relayer.createEncryptedInput(
+        getAddress(CONFIG.CONTRACT_ADDRESS),
+        getAddress(address)
+      );
+
+      enc.add16(BigInt(value));
+
+      const { handles, inputProof } = await enc.encrypt();
+      log("Encrypt result", { handleCount: handles.length, type0: typeof handles[0] });
+
+      const hRaw = handles[0]?.handle || handles[0]?.ciphertext || handles[0];
+      const handle = typeof hRaw === "string" ? hRaw : toHex(hRaw);
+
+      const att = typeof inputProof === "string"
+        ? (inputProof.startsWith("0x") ? inputProof : "0x" + inputProof)
+        : toHex(inputProof);
+
+      log("EncryptEuint16 final", { handle, attLen: att.length });
+      return { handle, attestation: att };
+    }
+
+    // 1) SUBMIT SCORE
+    $("#btnSubmitScore").onclick = async () => {
+      try {
+        log("SubmitScore", "click");
+        if (!(await connect())) return;
+
+        clearStatus("#scoreStatus");
+        $("#scoreLog").style.display = "none";
+
+        const userKey = $("#userKey").value;
+        const score = parseInt($("#userScore").value, 10) || 0;
+        const userId = toUserId(userKey);
+
+        setStatus("#scoreStatus", "Encrypting karaoke score…", "pending");
+        const { handle, attestation } = await encryptEuint16(score);
+
+        log("submitScore args", { userId, handle, attLen: attestation.length });
+
+        setStatus("#scoreStatus", "Submitting submitScore tx…", "pending");
+        const tx = await contract.submitScore(userId, handle, attestation);
+        log("Tx submitScore sent", tx.hash);
+        const receipt = await tx.wait();
+        log("Tx submitScore receipt", { blockNumber: receipt.blockNumber, status: receipt.status });
+
+        $("#scoreLog").textContent =
+          `Score submitted
+userKey: ${userKey}
+userId: ${userId}
+score: ${score}
+encHandle: ${handle}`;
+        $("#scoreLog").style.display = "block";
+
+        setStatus("#scoreStatus", "Secret score submitted", "success");
+      } catch (e) {
+        logError("SubmitScore", e);
+        setStatus("#scoreStatus", "Error: " + (e.message || String(e)), "error");
+      }
+    };
+
+    // 2) COMPUTE LEVEL
+    $("#btnComputeLevel").onclick = async () => {
+      try {
+        log("ComputeLevel", "click");
+        if (!(await connect())) return;
+
+        clearStatus("#levelStatus");
+        $("#levelHandleOutput").style.display = "none";
+
+        const userKey = $("#levelUserKey").value;
+        const userId = toUserId(userKey);
+        const zeroVal = 0;
+
+        setStatus("#levelStatus", "Encrypting zero value…", "pending");
+        const { handle: encZero, attestation } = await encryptEuint16(zeroVal);
+
+        log("computeLevel args", { userId, encZero, attLen: attestation.length });
+
+        setStatus("#levelStatus", "Submitting computeLevel tx…", "pending");
+        const tx = await contract.computeLevel(userId, encZero, attestation);
+        log("Tx computeLevel sent", tx.hash);
+        const receipt = await tx.wait();
+        log("Tx computeLevel receipt", { blockNumber: receipt.blockNumber, status: receipt.status });
+
+        setStatus("#levelStatus", "Level computed, fetching handle…", "pending");
+        const handle = await contract.levelHandle(userId);
+        log("levelHandle()", handle);
+
+        $("#levelHandleOutput").textContent = "Level Handle:\n" + handle;
+        $("#levelHandleOutput").style.display = "block";
+
+        $("#decryptUserKey").value = userKey;
+        $("#handleOutput").textContent = "Level Handle:\n" + handle;
+        $("#handleOutput").style.display = "block";
+
+        setStatus("#levelStatus", "Level handle stored", "success");
+      } catch (e) {
+        logError("ComputeLevel", e);
+        setStatus("#levelStatus", "Error: " + (e.message || String(e)), "error");
+      }
+    };
+
+    // 3) MAKE LEVEL PUBLIC
+    $("#btnMakeLevelPublic").onclick = async () => {
+      try {
+        log("MakeLevelPublic", "click");
+        if (!(await connect())) return;
+
+        clearStatus("#decryptStatus");
+
+        const userKey = $("#decryptUserKey").value;
+        const userId = toUserId(userKey);
+
+        setStatus("#decryptStatus", "Submitting makeLevelPublic tx…", "pending");
+        const tx = await contract.makeLevelPublic(userId);
+        log("Tx makeLevelPublic sent", tx.hash);
+        const receipt = await tx.wait();
+        log("Tx makeLevelPublic receipt", { blockNumber: receipt.blockNumber, status: receipt.status });
+
+        setStatus("#decryptStatus", "Level is now public", "success");
+      } catch (e) {
+        logError("MakeLevelPublic", e);
+        setStatus("#decryptStatus", "Error: " + (e.message || String(e)), "error");
+      }
+    };
+
+    // GET LEVEL HANDLE
+    $("#btnGetLevelHandle").onclick = async () => {
+      try {
+        log("GetLevelHandle", "click");
+        if (!(await connect())) return;
+
+        clearStatus("#decryptStatus");
+        $("#handleOutput").style.display = "none";
+
+        const userKey = $("#decryptUserKey").value;
+        const userId = toUserId(userKey);
+
+        setStatus("#decryptStatus", "Fetching level handle…", "pending");
+        const handle = await contract.levelHandle(userId);
+        log("levelHandle()", handle);
+
+        $("#handleOutput").textContent = "Level Handle:\n" + handle;
+        $("#handleOutput").style.display = "block";
+
+        setStatus("#decryptStatus", "Handle retrieved", "success");
+      } catch (e) {
+        logError("GetLevelHandle", e);
+        setStatus("#decryptStatus", "Error: " + (e.message || String(e)), "error");
+      }
+    };
+
+    // DECRYPT
+    function cleanHandle(raw) {
+      return String(raw).trim().split("\n").pop().trim();
+    }
+
+    async function decryptLevel(handleHex) {
+      if (!relayer) throw new Error("Relayer not initialized");
+
+      const handle = String(handleHex).trim();
+      if (!handle.startsWith("0x") || handle.length !== 66)
+        throw new Error("Invalid ciphertext handle");
+
+      const request = [handle];
+      const out = await relayer.publicDecrypt(request);
+
+      if (!out || typeof out !== "object" || !out.clearValues)
+        throw new Error("Invalid decrypt response");
+
+      const lower = handle.toLowerCase();
+      const result = out.clearValues[handle] ?? out.clearValues[lower];
+
+      if (result === undefined || result === null)
+        throw new Error("Decrypt produced no value");
+
+      return Number(result); // 0..3
+    }
+
+    $("#btnDecryptLevel").onclick = async () => {
+      try {
+        await connect();
+        clearStatus("#decryptStatus");
+
+        const raw = $("#handleOutput").textContent || $("#levelHandleOutput").textContent;
+        const handle = cleanHandle(raw);
+
+        const code = await decryptLevel(handle);
+
+        const resultDiv = $("#levelResult");
+        resultDiv.style.display = "block";
+
+        if (code === 0) {
+          resultDiv.className = "result-box none";
+          resultDiv.textContent = "Level: None (0). Keep practicing!";
+        } else if (code === 1) {
+          resultDiv.className = "result-box bronze";
+          resultDiv.textContent = "Level: Bronze (1). Nice start!";
+        } else if (code === 2) {
+          resultDiv.className = "result-box silver";
+          resultDiv.textContent = "Level: Silver (2). Great singing!";
+        } else if (code === 3) {
+          resultDiv.className = "result-box gold";
+          resultDiv.textContent = "Level: Gold (3). Karaoke legend!";
+        } else {
+          resultDiv.className = "result-box none";
+          resultDiv.textContent = "Unexpected level code: " + code;
+        }
+
+        setStatus("#decryptStatus", "✅ Level decrypted", "success");
+      } catch (e) {
+        logError("DecryptLevel", e);
+        setStatus("#decryptStatus", "Error: " + (e.message || String(e)), "error");
+      }
+    };
+
+    log("Script", "✅ Karaoke handlers attached and ready");
+  </script>
+</body>
+</html>
